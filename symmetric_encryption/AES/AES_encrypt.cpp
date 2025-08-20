@@ -36,6 +36,8 @@ static const u_int8_t substitutionBox[256] = {
     0x41,0x99,0x2d,0x0f,0xb0,0x54,0xbb,0x16
 };
 
+const u_int8_t roundConstant[10] = {0x01,0x02,0x04,0x08,0x10,0x20,0x40,0x80,0x1B,0x36};
+
 u_int8_t gmul(u_int8_t a, u_int8_t b) {
     u_int8_t p = 0;
     for(int i = 0; i < 8; i++) {
@@ -101,32 +103,64 @@ void addRoundKey(u_int8_t state[4][4], u_int8_t key[16]) {
     }
 }
 
-std::string encryptAES(u_int8_t key[16], std::string message) {
-    u_int8_t state[4][4];
+void expandKey(const u_int8_t key[16], u_int8_t roundKeys[11][16]) { //TODO: Better naming
     for(int i = 0; i < 16; i++) {
-        if(i < message.size()) {
-            state[i%4][i/4] = static_cast<u_int8_t>(message[i]);
-        } else {
-            state[i%4][i/4] = 0;
+        roundKeys[0][i]=key[i];
+    } 
+    
+    for(int i = 1; i <= 10; i++){
+        u_int8_t temp[4];
+        temp[0]=roundKeys[i-1][13];
+        temp[1]=roundKeys[i-1][14];
+        temp[2]=roundKeys[i-1][15]; 
+        temp[3]=roundKeys[i-1][12];
+        
+        for(int j = 0; j < 4; j++) {
+            temp[j]=substitutionBox[temp[j]];
+        } 
+            temp[0] ^= roundConstant[i-1];
+        
+        for(int j = 0; j < 4; j++){
+            roundKeys[i][j]=roundKeys[i-1][j]^temp[j];
+        }
+        
+        for(int j = 4; j < 16; j++){
+            roundKeys[i][j]=roundKeys[i-1][j]^roundKeys[i][j-4];
         }
     }
+}
 
-    for(int i = 0; i < 10; i++) {
-        subByte(state);
-        shiftRows(state);
-        if(i != 9) mixedCollums(state);
-        addRoundKey(state, key);
-    }
+std::string encryptAES(u_int8_t key[16], std::string message) {
+    std::string encryptedMessage = "";
+    u_int8_t state[4][4];
+    u_int8_t roundKeys[11][16];
+    expandKey(key, roundKeys);
+    
+    for(int i = 0; i < message.size(); i += 16) {
+        for(int i = 0; i < 16; i++) {
+            if(i < message.size()) {
+                state[i%4][i/4] = static_cast<u_int8_t>(message[i]);
+            } else {
+                state[i%4][i/4] = 0;
+            }
+        }
 
-    const char* hexChars = "0123456789abcdef";
-    std::string encryptedMessage;
-    encryptedMessage.reserve(32);
+        for(int i = 0; i < 10; i++) {
+            subByte(state);
+            shiftRows(state);
+            if(i != 9) mixedCollums(state);
+            addRoundKey(state, key);
+        }
 
-    for(int col = 0; col < 4; col++) {
-        for(int row = 0; row < 4; row++) {
-            u_int8_t byte = state[row][col];
-            encryptedMessage += hexChars[byte >> 4];
-            encryptedMessage += hexChars[byte & 0x0F];
+        const char* hexChars = "0123456789abcdef";
+        encryptedMessage.reserve(32);
+
+        for(int col = 0; col < 4; col++) {
+            for(int row = 0; row < 4; row++) {
+                u_int8_t byte = state[row][col];
+                encryptedMessage += hexChars[byte >> 4];
+                encryptedMessage += hexChars[byte & 0x0F];
+            }
         }
     }
 
