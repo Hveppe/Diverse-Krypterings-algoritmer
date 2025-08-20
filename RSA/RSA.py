@@ -1,6 +1,6 @@
 import hashlib
 
-def krypterer_RSA(pk: tuple, sk: tuple, besked: str):
+def krypterer_RSA(pk: tuple, sk: tuple, besked: str) -> str:
     e, n = pk
     d, n_s = sk
 
@@ -17,7 +17,7 @@ def krypterer_RSA(pk: tuple, sk: tuple, besked: str):
     return f"{Result}|{signatur}"
 
 
-def dekrypter_RSA(pk: tuple, sk: tuple, besked: str):
+def dekrypter_RSA(pk: tuple, sk: tuple, besked: str) -> str:
     e, n = pk
     d, n_s = sk
     
