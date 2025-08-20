@@ -104,57 +104,62 @@ void addRoundKey(u_int8_t state[4][4], u_int8_t key[16]) {
 }
 
 void expandKey(const u_int8_t key[16], u_int8_t roundKeys[11][16]) { //TODO: Better naming
-    for(int i = 0; i < 16; i++) {
-        roundKeys[0][i]=key[i];
-    } 
-    
-    for(int i = 1; i <= 10; i++){
+    for(int i = 0; i < 16; i++)
+        roundKeys[0][i] = key[i];
+
+    for(int round = 1; round <= 10; round++) {
         u_int8_t temp[4];
-        temp[0]=roundKeys[i-1][13];
-        temp[1]=roundKeys[i-1][14];
-        temp[2]=roundKeys[i-1][15]; 
-        temp[3]=roundKeys[i-1][12];
-        
-        for(int j = 0; j < 4; j++) {
-            temp[j]=substitutionBox[temp[j]];
-        } 
-            temp[0] ^= roundConstant[i-1];
-        
-        for(int j = 0; j < 4; j++){
-            roundKeys[i][j]=roundKeys[i-1][j]^temp[j];
-        }
-        
-        for(int j = 4; j < 16; j++){
-            roundKeys[i][j]=roundKeys[i-1][j]^roundKeys[i][j-4];
-        }
+        temp[0] = roundKeys[round-1][12];
+        temp[1] = roundKeys[round-1][13];
+        temp[2] = roundKeys[round-1][14];
+        temp[3] = roundKeys[round-1][15];
+
+        u_int8_t t = temp[0];
+        temp[0] = temp[1];
+        temp[1] = temp[2];
+        temp[2] = temp[3];
+        temp[3] = t;
+
+        for(int i = 0; i < 4; i++)
+            temp[i] = substitutionBox[temp[i]];
+
+        temp[0] ^= roundConstant[round-1];
+
+        for(int i = 0; i < 4; i++)
+            roundKeys[round][i] = roundKeys[round-1][i] ^ temp[i];
+
+        for(int i = 4; i < 16; i++)
+            roundKeys[round][i] = roundKeys[round-1][i] ^ roundKeys[round][i-4];
     }
 }
 
 std::string encryptAES(u_int8_t key[16], std::string message) {
     std::string encryptedMessage = "";
+    encryptedMessage.reserve(((message.size() + 15) / 16) * 32);
+
     u_int8_t state[4][4];
     u_int8_t roundKeys[11][16];
     expandKey(key, roundKeys);
     
-    for(int i = 0; i < message.size(); i += 16) {
-        for(int i = 0; i < 16; i++) {
-            if(i < message.size()) {
-                state[i%4][i/4] = static_cast<u_int8_t>(message[i]);
+    for(int ofset = 0; ofset < message.size(); ofset += 16) {
+        for(int i = 0 ; i < 16; i++) {
+            if(i + ofset < message.size()) {
+                state[i%4][i/4] = static_cast<u_int8_t>(message[i + ofset]);
             } else {
                 state[i%4][i/4] = 0;
             }
         }
 
-        for(int i = 0; i < 10; i++) {
+        addRoundKey(state, roundKeys[0]);
+
+        for(int i = 1; i <= 10; i++) {
             subByte(state);
             shiftRows(state);
-            if(i != 9) mixedCollums(state);
-            addRoundKey(state, key);
+            if(i != 10) mixedCollums(state);
+            addRoundKey(state, roundKeys[i]);
         }
 
         const char* hexChars = "0123456789abcdef";
-        encryptedMessage.reserve(32);
-
         for(int col = 0; col < 4; col++) {
             for(int row = 0; row < 4; row++) {
                 u_int8_t byte = state[row][col];
