@@ -6,7 +6,7 @@ long long modPow(long long base, unsigned long long exponent, long long modulus)
         return 0;
     }
 
-    int result = 1;
+    long long result = 1;
     base %= modulus;
 
     while(exponent > 0) {
