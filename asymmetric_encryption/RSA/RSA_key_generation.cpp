@@ -1,33 +1,33 @@
 struct keyRSA{
-    int e = 0;
-    int d = 0;
-    int n = 0;
+    long long e = 0;
+    long long d = 0;
+    long long n = 0;
 };
 
-int gcd(int firstNumber, int secondNumber) {
+long long gcd(long long firstNumber, long long secondNumber) {
     while(secondNumber != 0) {
-        int temp = secondNumber;
+        long long temp = secondNumber;
         secondNumber = firstNumber % secondNumber;
         firstNumber = temp;
     }
     return firstNumber;
 }
 
-int modInverse(int e, int phi) {
-    for(int d = 2; d < phi; d++) {
+long long modInverse(long long e, long long phi) {
+    for(long long d = 2; d < phi; d++) {
         if((e * d) % phi == 1) {
             return d;
         }
     }
 }
 
-keyRSA generateKeys(int p, int q) {
+keyRSA generateKeys(long long p, long long q) {
     keyRSA key;
     
     key.n = p * q;
-    int phi = (p - 1) * (q - 1);
+    long long phi = (p - 1) * (q - 1);
 
-    for(int e = 2; e < phi; e++) {
+    for(long long e = 2; e < phi; e++) {
         if(gcd(e, phi) == 1) {
             key.e = e;
             break;
