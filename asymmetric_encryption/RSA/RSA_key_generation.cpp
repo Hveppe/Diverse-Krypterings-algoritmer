@@ -1,4 +1,4 @@
-struct keys{
+struct keyRSA{
     int e = 0;
     int d = 0;
     int n = 0;
@@ -13,16 +13,16 @@ int gcd(int firstNumber, int secondNumber) {
     return firstNumber;
 }
 
-int modInverse(int publicExponet, int phi) {
+int modInverse(int e, int phi) {
     for(int d = 2; d < phi; d++) {
-        if((publicExponet * d) % phi == 1) {
+        if((e * d) % phi == 1) {
             return d;
         }
     }
 }
 
-keys generateKeys(int p, int q) {
-    keys key;
+keyRSA generateKeys(int p, int q) {
+    keyRSA key;
     
     key.n = p * q;
     int phi = (p - 1) * (q - 1);
