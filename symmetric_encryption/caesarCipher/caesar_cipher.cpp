@@ -1,4 +1,4 @@
-#include <string>
+#include "caesar_cipher.h"
 
 std::string encryptCaesar(int key, std::string message) {
     std::string encryptedMessage = "";
