@@ -73,21 +73,21 @@ static const uint8_t invSubstitutionBox[256] = {
 };
 
 uint8_t galoisFieldMultiplication(uint8_t a, uint8_t b) {
-    uint8_t p = 0;
+    uint8_t product = 0;
     for(int i = 0; i < 8; i++) {
         if(b & 1) {
-            p ^= a;
+            product ^= a;
         } 
-        bool hiBitSet = a & 0x80;
+        bool highBitSet = a & 0x80;
         a <<= 1;
 
-        if(hiBitSet) {
+        if(highBitSet) {
            a ^= 0x1b;
         } 
 
         b >>= 1;
     }
-    return p;
+    return product;
 }
 
 // encryption layers
@@ -124,15 +124,15 @@ void shiftRows(uint8_t state[4][4]) {
 
 void mixedCollums(uint8_t state[4][4]) {
     for(int i = 0; i < 4; i++) {
-        uint8_t temp0 = state[0][i];
-        uint8_t temp1 = state[1][i];
-        uint8_t temp2 = state[2][i];
-        uint8_t temp3 = state[3][i];
+        uint8_t state0 = state[0][i];
+        uint8_t state1 = state[1][i];
+        uint8_t state2 = state[2][i];
+        uint8_t state4 = state[3][i];
 
-        state[0][i] = galoisFieldMultiplication(temp0,2) ^ galoisFieldMultiplication(temp1,3) ^ temp2 ^ temp3;
-        state[1][i] = temp0 ^ galoisFieldMultiplication(temp1,2) ^ galoisFieldMultiplication(temp2,3) ^ temp3;
-        state[2][i] = temp0 ^ temp1 ^ galoisFieldMultiplication(temp2,2) ^ galoisFieldMultiplication(temp3,3);
-        state[3][i] = galoisFieldMultiplication(temp0,3) ^ temp1 ^ temp2 ^ galoisFieldMultiplication(temp3,2);
+        state[0][i] = galoisFieldMultiplication(state0,2) ^ galoisFieldMultiplication(state1,3) ^ state2 ^ state4;
+        state[1][i] = state0 ^ galoisFieldMultiplication(state1,2) ^ galoisFieldMultiplication(state2,3) ^ state4;
+        state[2][i] = state0 ^ state1 ^ galoisFieldMultiplication(state2,2) ^ galoisFieldMultiplication(state4,3);
+        state[3][i] = galoisFieldMultiplication(state0,3) ^ state1 ^ state2 ^ galoisFieldMultiplication(state4,2);
     }
 }
 
@@ -170,15 +170,15 @@ void invShiftRows(uint8_t state[4][4]) {
 
 void invMixedCollumns(uint8_t state[4][4]) {
     for(int i = 0; i < 4; i++) {
-        uint8_t temp0 = state[0][i];
-        uint8_t temp1 = state[1][i];
-        uint8_t temp2 = state[2][i];
-        uint8_t temp3 = state[3][i];
+        uint8_t state0 = state[0][i];
+        uint8_t state1 = state[1][i];
+        uint8_t state2 = state[2][i];
+        uint8_t state3 = state[3][i];
 
-        state[0][i] = galoisFieldMultiplication(temp0, 14) ^ galoisFieldMultiplication(temp1, 11) ^ galoisFieldMultiplication(temp2, 13) ^ galoisFieldMultiplication(temp3, 9);
-        state[1][i] = galoisFieldMultiplication(temp0, 9) ^ galoisFieldMultiplication(temp1, 14) ^ galoisFieldMultiplication(temp2, 11) ^ galoisFieldMultiplication(temp3, 13);
-        state[2][i] = galoisFieldMultiplication(temp0, 13) ^ galoisFieldMultiplication(temp1, 9) ^ galoisFieldMultiplication(temp2, 14) ^ galoisFieldMultiplication(temp3, 11);
-        state[3][i] = galoisFieldMultiplication(temp0, 11) ^ galoisFieldMultiplication(temp1, 13) ^ galoisFieldMultiplication(temp2, 9) ^ galoisFieldMultiplication(temp3, 14);
+        state[0][i] = galoisFieldMultiplication(state0, 14) ^ galoisFieldMultiplication(state1, 11) ^ galoisFieldMultiplication(state2, 13) ^ galoisFieldMultiplication(state3, 9);
+        state[1][i] = galoisFieldMultiplication(state0, 9) ^ galoisFieldMultiplication(state1, 14) ^ galoisFieldMultiplication(state2, 11) ^ galoisFieldMultiplication(state3, 13);
+        state[2][i] = galoisFieldMultiplication(state0, 13) ^ galoisFieldMultiplication(state1, 9) ^ galoisFieldMultiplication(state2, 14) ^ galoisFieldMultiplication(state3, 11);
+        state[3][i] = galoisFieldMultiplication(state0, 11) ^ galoisFieldMultiplication(state1, 13) ^ galoisFieldMultiplication(state2, 9) ^ galoisFieldMultiplication(state3, 14);
     }
 }
 
@@ -210,7 +210,6 @@ void expandKey(const uint8_t key[16], uint8_t roundKeys[11][16]) { //TODO: Bette
 
         for(int i = 0; i < 4; i++)
             temp[i] = substitutionBox[temp[i]];
-
         temp[0] ^= roundConstant[round-1];
 
         for(int i = 0; i < 4; i++)
