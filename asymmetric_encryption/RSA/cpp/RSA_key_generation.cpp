@@ -13,6 +13,7 @@ long long gcd(long long firstNumber, long long secondNumber) {
     return firstNumber;
 }
 
+// Technelly not inverse of modulo but bruteforce of d
 long long modInverse(long long e, long long phi) {
     for(long long d = 2; d < phi; d++) {
         if((e * d) % phi == 1) {

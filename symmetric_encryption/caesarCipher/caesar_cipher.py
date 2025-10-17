@@ -1,15 +1,17 @@
-def krypter_caesar(besked: str, key: int) -> str:
-    krypteret_beksed : str = ""
+chars : str = "abcdefghijklmnopqrstuvwxyz"
 
-    for charecter in besked:
-        krypteret_beksed += chr(ord(charecter)+key) # Krypterer beskeder med key
+def krypter_caesar(message : str, key : int) -> str:
+    encryptedMessage : str = ""
 
-    return krypteret_beksed
+    for char in message:
+        encryptedMessage += chars[chars.find(char.lower()) + key % 26]
 
-def dekrypter_caesar(besked: str, key: int) -> str:
-    dekrypteret_besked : str = ""
+    return encryptedMessage
 
-    for charecter in besked:
-        dekrypteret_besked += chr(ord(charecter)-key) # Dekrypterer beskeder med key
+def dekrypter_caesar(message : str, key : int) -> str:
+    decryptedMessage : str = ""
 
-    return dekrypteret_besked
+    for char in message:
+        decryptedMessage += chars[chars.find(char.lower()) - key % 26]
+
+    return decryptedMessage
