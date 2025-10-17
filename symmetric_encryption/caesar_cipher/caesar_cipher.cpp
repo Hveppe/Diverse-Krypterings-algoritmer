@@ -2,9 +2,11 @@
 
 std::string encryptCaesar(int key, std::string message) {
     std::string encryptedMessage = "";
+    int charIntValue;
 
     for(char letter : message) {
-        encryptedMessage.push_back(static_cast<char>(static_cast<int>(letter) + key));
+        charIntValue = (static_cast<int>(std::tolower(letter)) + key - 97) % 26 + 97;
+        encryptedMessage.push_back(static_cast<char>(charIntValue));
     }
 
     return encryptedMessage;
@@ -12,9 +14,11 @@ std::string encryptCaesar(int key, std::string message) {
 
 std::string decryptCaesar(int key, std::string message) {
     std::string decryptedMessage = "";
+     int charIntValue;
 
     for(char letter : message) {
-        decryptedMessage.push_back(static_cast<char>(static_cast<int>(letter) - key));
+        charIntValue = (static_cast<int>(std::tolower(letter)) - key - 97) % 26 + 97;
+        decryptedMessage.push_back(static_cast<char>(charIntValue));
     }
 
     return decryptedMessage;
