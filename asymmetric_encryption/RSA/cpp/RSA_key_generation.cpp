@@ -22,7 +22,7 @@ long long modInverse(long long e, long long phi) {
     }
 }
 
-keyRSA generateKeys(long long p, long long q) {
+keyRSA RSAgenerateKeys(long long p, long long q) {
     keyRSA key;
     
     key.n = p * q;
