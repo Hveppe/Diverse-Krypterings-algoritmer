@@ -292,8 +292,29 @@ std::vector<u_int8_t> hexToByte(const std::string &hex) {
     return bytes;
 }
 
+void convertKeyToBytes(uint8_t key[16], std::string hexKey) {
+    std::vector<uint8_t> bytes = hexToByte(hexKey);
+    for(size_t i = 0; i < bytes.size(); i++) {
+        key[i] = bytes[i];
+    }
+}
+
+// ----------------------------------Key Generation----------------------------------
+std::string generateKeyAES() {
+    std::vector<u_int8_t> key(16);
+    std::random_device rd;
+    for(size_t i = 0; i < 16; i++) {
+        key[i] = static_cast<uint8_t>(rd());
+    }
+    return byteToHex(key);
+}
+
 // ---------------------Encryption and decryption functions--------------------------
-std::string encryptAES(uint8_t key[16], const std::string &message) {
+std::string encryptAES(std::string hexKey, const std::string &message) {
+    // convert key from hex to byte
+    uint8_t key[16];
+    convertKeyToBytes(key, hexKey);
+
     std::vector<uint8_t> msgBytes(message.begin(), message.end());
     auto padded = pks7Padding(msgBytes);
 
@@ -345,7 +366,11 @@ std::string encryptAES(uint8_t key[16], const std::string &message) {
     return byteToHex(output);
 }
 
-std::string decryptAES(uint8_t key[16], const std::string &encryptedMessage) {
+std::string decryptAES(std::string hexKey, const std::string &encryptedMessage) {
+    // convert key from hex to byte
+    uint8_t key[16];
+    convertKeyToBytes(key, hexKey);
+
     std::vector<u_int8_t> cipherBytes = hexToByte(encryptedMessage);
 
     if(cipherBytes.size() < 16) { // invalid length
