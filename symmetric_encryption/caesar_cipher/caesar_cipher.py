@@ -15,5 +15,3 @@ def decryptCaesar(message : str, key : int) -> str:
         decryptedMessage += chars[chars.find(char.lower()) - key % 26]
 
     return decryptedMessage
-
-print(encryptCeasar("hello", 5))
