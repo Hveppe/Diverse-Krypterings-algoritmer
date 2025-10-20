@@ -12,7 +12,7 @@
 
 // define functions for export to other files
 std::string generateKeyAES();
-std::string encryptAES(uint8_t key[16], const std::string &message);
-std::string decryptAES(uint8_t key[16], const std::string &encryptedMessage);
+std::string encryptAES(std::string hexKey, const std::string &message);
+std::string decryptAES(std::string hexKey, const std::string &encryptedMessage);
 
 #endif

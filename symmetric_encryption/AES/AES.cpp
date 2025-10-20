@@ -168,7 +168,7 @@ void invShiftRows(uint8_t state[4][4]) {
     state[3][3] = temp;
 }
 
-void invMixedCollumns(uint8_t state[4][4]) {
+void invMixCollumns(uint8_t state[4][4]) {
     for(int i = 0; i < 4; i++) {
         uint8_t state0 = state[0][i];
         uint8_t state1 = state[1][i];
@@ -318,8 +318,8 @@ std::string encryptAES(std::string hexKey, const std::string &message) {
     std::vector<uint8_t> msgBytes(message.begin(), message.end());
     auto padded = pks7Padding(msgBytes);
 
-    std::vector<uint8_t> iv = generateRandomBytes(16);
-    std::vector<uint8_t> previousBlock = iv;
+    std::vector<uint8_t> initializationVector = generateRandomBytes(16); // Random 16 byte array used to make every encryption diffrent 
+    std::vector<uint8_t> previousBlock = initializationVector;
 
     uint8_t roundKeys[11][16];
     expandKey(key, roundKeys);
@@ -327,7 +327,7 @@ std::string encryptAES(std::string hexKey, const std::string &message) {
     std::vector<uint8_t> cipherText; 
     cipherText.reserve(padded.size());
 
-    uint8_t state[4][4];
+    uint8_t state[4][4]; // declare AES State Matrix
     
     for(size_t offset = 0; offset < padded.size(); offset += 16) {
         uint8_t block[16];
@@ -349,6 +349,7 @@ std::string encryptAES(std::string hexKey, const std::string &message) {
             addRoundKey(state, roundKeys[r]);
         }
 
+        // convert from AES State Matrix back into linear array
         uint8_t cipherBlock[16];
         for(int i = 0; i < 16; ++i) {
             cipherBlock[i] = state[i%4][i/4];
@@ -358,9 +359,10 @@ std::string encryptAES(std::string hexKey, const std::string &message) {
         previousBlock.assign(cipherBlock, cipherBlock + 16);
     }
 
+    // combine initializationVector (IV) and cipher tekst
     std::vector<uint8_t> output;
     output.reserve(16 + cipherText.size());
-    output.insert(output.end(), iv.begin(), iv.end());
+    output.insert(output.end(), initializationVector.begin(), initializationVector.end());
     output.insert(output.end(), cipherText.begin(), cipherText.end());
 
     return byteToHex(output);
@@ -377,7 +379,8 @@ std::string decryptAES(std::string hexKey, const std::string &encryptedMessage) 
         return "";
     }
 
-    std::vector<uint8_t> iv(cipherBytes.begin(), cipherBytes.begin() + 16);
+    // Split message into initializationVector (IV) and cipher text
+    std::vector<uint8_t> initializationVector(cipherBytes.begin(), cipherBytes.begin() + 16);
     std::vector<uint8_t> cipherText(cipherBytes.begin() + 16, cipherBytes.end());
 
     uint8_t roundKeys[11][16];
@@ -387,9 +390,9 @@ std::string decryptAES(std::string hexKey, const std::string &encryptedMessage) 
     decryptedText.reserve(cipherText.size());
     uint8_t previousBlock[16];
 
-    std::copy(iv.begin(), iv.end(), previousBlock);
+    std::copy(initializationVector.begin(), initializationVector.end(), previousBlock);
 
-    uint8_t state[4][4];
+    uint8_t state[4][4]; // declare AES State Matrix
 
     for(size_t offset = 0; offset < cipherText.size(); offset += 16) {
         uint8_t block[16];
@@ -400,13 +403,14 @@ std::string decryptAES(std::string hexKey, const std::string &encryptedMessage) 
 
         addRoundKey(state, roundKeys[10]);
 
-        for(int r = 10; r >= 1; --r) {
-            if(r != 10) invMixedCollumns(state);
+        for(int r = 9; r >= 0; --r) {
+            if(r != 9) invMixCollumns(state);
             invShiftRows(state);
             invSubBytes(state);
             addRoundKey(state, roundKeys[r]);
         }
 
+        // Use IV or previous block for conversion to plaintext 
         uint8_t plainBlock[16];
         for(int i = 0; i < 16; ++i) {
             plainBlock[i] = state[i%4][i/4] ^ previousBlock[i];
