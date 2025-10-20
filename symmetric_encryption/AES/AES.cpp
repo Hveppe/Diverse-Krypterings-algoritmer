@@ -400,8 +400,8 @@ std::string decryptAES(std::string hexKey, const std::string &encryptedMessage) 
 
         addRoundKey(state, roundKeys[10]);
 
-        for(int r = 9; r >= 0; --r) {
-            if(r != 9) invMixedCollumns(state);
+        for(int r = 10; r >= 1; --r) {
+            if(r != 10) invMixedCollumns(state);
             invShiftRows(state);
             invSubBytes(state);
             addRoundKey(state, roundKeys[r]);
