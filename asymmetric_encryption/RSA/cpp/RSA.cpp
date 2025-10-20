@@ -1,5 +1,4 @@
-#include <string>
-#include <iostream>
+#include "RSA.h"
 
 long long modPow(long long base, unsigned long long exponent, long long modulus) {
     if(modulus == 1) {
