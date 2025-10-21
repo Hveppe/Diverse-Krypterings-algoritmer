@@ -1,8 +1,4 @@
-struct keyRSA{
-    long long e = 0;
-    long long d = 0;
-    long long n = 0;
-};
+#include "RSA.h"
 
 long long gcd(long long firstNumber, long long secondNumber) {
     while(secondNumber != 0) {
@@ -20,9 +16,10 @@ long long modInverse(long long e, long long phi) {
             return d;
         }
     }
+    return -1;
 }
 
-keyRSA RSAgenerateKeys(long long p, long long q) {
+keyRSA generateKeysRSA(long long p, long long q) {
     keyRSA key;
     
     key.n = p * q;

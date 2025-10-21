@@ -5,9 +5,14 @@
 #include <iostream>
 
 // define functions and structs for export to other files
-struct keyRSA;
-keyRSA RSAgenerateKeys(long long p, long long q);
-std::string EncryptRSA(long long e, long long n, std::string message);
+struct keyRSA {
+    long long e = 0;
+    long long d = 0;
+    long long n = 0;
+};
+
+keyRSA generateKeysRSA(long long p, long long q);
+std::string encryptRSA(long long e, long long n, std::string message);
 std::string decryptRSA(long long d, long long n, std::string message);
 
 #endif

@@ -19,7 +19,7 @@ long long modPow(long long base, unsigned long long exponent, long long modulus)
     return result;
 }
 
-std::string EncryptRSA(long long e, long long n, std::string message) {
+std::string encryptRSA(long long e, long long n, std::string message) {
     std::string encryptedMessage = "";
     int maxLen = std::to_string(n).length();
 
