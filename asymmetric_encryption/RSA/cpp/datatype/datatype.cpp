@@ -83,6 +83,16 @@ bigInteger bigInteger::operator+(const long long &number) const {
     return first + second;
 }
 
+bigInteger &bigInteger::operator+=(const bigInteger &number) {
+    this->value = (*this + number).value;
+    return *this;
+}
+
+bigInteger &bigInteger::operator+=(const long long &number) {
+    this->value = (*this + bigInteger(number)).value;
+    return *this;
+}
+
 bigInteger bigInteger::operator*(const bigInteger &number) const {
     std::string first = this->value;
     std::string second = number.value;
@@ -119,6 +129,17 @@ bigInteger bigInteger::operator*(const long long &number) const {
     bigInteger second = this->value;
     return first * second;
 }
+
+bigInteger &bigInteger::operator*=(const bigInteger &number) {
+    this->value = (*this * number).value;
+    return *this;
+}
+
+bigInteger &bigInteger::operator*=(const long long &number) {
+    this->value = (*this * bigInteger(number)).value;
+    return *this;
+}
+
 
 //------------------------Custom functions----------------------------------
 int bigInteger::castToInt() {
