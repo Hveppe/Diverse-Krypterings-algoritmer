@@ -2,23 +2,35 @@
 
 // Constructers
 bigInteger::bigInteger() {
-    value = "0";
+    this->value = "0";
 }
 
 bigInteger::bigInteger(const bigInteger &number) {
-    value = number.value;
+    this->value = number.value;
+}
+
+bigInteger::bigInteger(const long long &number) {
+    this->value = std::to_string(number);
+}
+
+bigInteger::bigInteger(const std::string &number) {
+    this->value = number;
 }
 
 // Operators 
-bigInteger &bigInteger::bigInteger::operator=(const bigInteger &number) {
+bigInteger &bigInteger::operator=(const bigInteger &number) {
     value = number.value;
+    return *this;
 }
 
-bigInteger &bigInteger::bigInteger::operator+(bigInteger &number) {
+bigInteger bigInteger::operator+(const bigInteger &number) const {
+    std::string first = this->value;
+    std::string second = number.value; 
+    
     if (this->value.size() < number.value.size()) {
-        this->value = std::string(number.value.size() - this->value.size(), '0') + this->value;
+       first = std::string(number.value.size() - this->value.size(), '0') + this->value;
     } else if (number.value.size() < this->value.size()) {
-       number.value = std::string(this->value.size() - number.value.size(), '0') + number.value;
+       second = std::string(this->value.size() - number.value.size(), '0') + number.value;
     } 
 
     int carry = 0;
@@ -27,8 +39,8 @@ bigInteger &bigInteger::bigInteger::operator+(bigInteger &number) {
     std::string result(this->value.size() + 1, '0');
 
     // Addition digit by digit 
-    for(size_t i = this->value.size() - 1; i >= 0; i--) {
-        sum = (this->value[i] - '0') + (number.value[i] - '0') + carry;
+    for(int i = first.size() - 1; i >= 0; i--) {
+        sum = (first[i] - '0') + (second[i] - '0') + carry;
         carry = sum / 10;
 
         result[i + 1] = ('0' + (sum % 10));
@@ -37,9 +49,10 @@ bigInteger &bigInteger::bigInteger::operator+(bigInteger &number) {
     if(carry) {
         result[0] = '0' + carry;
     } else {
-        result.substr(1); // remove extra zero in the front
+        result = result.substr(1); // remove extra zero in the front
     }
 
     // assign value
-    this->value = result;
+    bigInteger returnResult =  result;
+    return returnResult;
 }
