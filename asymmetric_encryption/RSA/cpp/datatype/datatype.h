@@ -15,12 +15,18 @@ struct bigInteger {
 
     // assignment oprators for all valid datatypes
     bigInteger &operator=(const bigInteger&);
+    bigInteger &operator=(const long long&);
+    bigInteger &operator=(const std::string&);
 
     // Operators
-    bigInteger operator+(const bigInteger&) const; 
+    bigInteger operator+(const bigInteger&) const;
+    bigInteger operator+(const long long&) const;
 
     // Functions
     int castToInt();
 };
+
+// custom std::cout instruction
+std::ostream &operator<<(std::ostream &os, const bigInteger&);
 
 #endif

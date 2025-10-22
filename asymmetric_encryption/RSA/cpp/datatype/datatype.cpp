@@ -1,6 +1,6 @@
 #include "datatype.h"
 
-// Constructers
+//--------------------------Constructers----------------------------
 bigInteger::bigInteger() {
     this->value = "0";
 }
@@ -17,12 +17,23 @@ bigInteger::bigInteger(const std::string &number) {
     this->value = number;
 }
 
-// Operators 
+//----------------------Assignment Oprators--------------------------
 bigInteger &bigInteger::operator=(const bigInteger &number) {
     value = number.value;
     return *this;
 }
 
+bigInteger &bigInteger::operator=(const long long &number) {
+    value = std::to_string(number);
+    return *this;
+}
+
+bigInteger &bigInteger::operator=(const std::string &number) {
+    value = number;
+    return *this;
+}
+
+//-------------------------------Operators----------------------------------
 bigInteger bigInteger::operator+(const bigInteger &number) const {
     std::string first = this->value;
     std::string second = number.value; 
@@ -55,4 +66,21 @@ bigInteger bigInteger::operator+(const bigInteger &number) const {
     // assign value
     bigInteger returnResult =  result;
     return returnResult;
+}
+
+bigInteger bigInteger::operator+(const long long& number) const {
+    bigInteger first = number;
+    bigInteger second = this->value;
+    return first + second;
+}
+
+//------------------------Custom functions----------------------------------
+int bigInteger::castToInt() {
+    return std::stoi(this->value);
+}
+
+//------------------------std::cout instruction------------------------------
+std::ostream &operator<<(std::ostream &os, const bigInteger &number) {
+    os << number.value;
+    return os;
 }
