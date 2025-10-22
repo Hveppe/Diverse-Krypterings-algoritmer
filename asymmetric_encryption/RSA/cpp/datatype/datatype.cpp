@@ -17,7 +17,7 @@ bigInteger::bigInteger(const std::string &number) {
     this->value = number;
 }
 
-//----------------------Assignment Oprators--------------------------
+//----------------------Assignment Operators--------------------------
 bigInteger &bigInteger::operator=(const bigInteger &number) {
     value = number.value;
     return *this;
@@ -33,12 +33,21 @@ bigInteger &bigInteger::operator=(const std::string &number) {
     return *this;
 }
 
+//---------------------------Comparesion Operators---------------------------
+bool bigInteger::operator==(const bigInteger &number) const {
+    return this->value == number.value;
+}
+
+bool bigInteger::operator==(const long long &number) const {
+    return this->value == std::to_string(number);
+}
+
 //-------------------------------Operators----------------------------------
 bigInteger bigInteger::operator+(const bigInteger &number) const {
     std::string first = this->value;
     std::string second = number.value; 
     
-    if (this->value.size() < number.value.size()) {
+    if(this->value.size() < number.value.size()) {
        first = std::string(number.value.size() - this->value.size(), '0') + this->value;
     } else if (number.value.size() < this->value.size()) {
        second = std::string(this->value.size() - number.value.size(), '0') + number.value;
@@ -68,10 +77,47 @@ bigInteger bigInteger::operator+(const bigInteger &number) const {
     return returnResult;
 }
 
-bigInteger bigInteger::operator+(const long long& number) const {
+bigInteger bigInteger::operator+(const long long &number) const {
     bigInteger first = number;
     bigInteger second = this->value;
     return first + second;
+}
+
+bigInteger bigInteger::operator*(const bigInteger &number) const {
+    std::string first = this->value;
+    std::string second = number.value;
+
+    std::vector<int> result(first.size() + second.size(), 0);
+
+    std::reverse(first.begin(), first.end());
+    std::reverse(second.begin(), second.end());
+
+    for(size_t i = 0; i < first.size(); i++) {
+        for(size_t j = 0; j < second.size(); j++) {
+            int index = i + j;
+            result[index] += (first[i] - '0') * (second[j] - '0');
+            if(result[index] >= 10) {
+                result[index + 1] += result[index] / 10;
+                result[index] %= 10;
+            }
+        }
+    }
+
+    while(result.size() > 1 && result.back() == 0) {
+        result.pop_back();
+    }
+
+    bigInteger produkt = std::string("");
+    for(int i = result.size() - 1; i >= 0; i--) {
+        produkt.value.push_back('0' + result[i]);
+    }
+    return produkt;
+}
+
+bigInteger bigInteger::operator*(const long long &number) const {
+    bigInteger first = number;
+    bigInteger second = this->value;
+    return first * second;
 }
 
 //------------------------Custom functions----------------------------------
