@@ -29,16 +29,19 @@ struct bigInteger {
     bigInteger operator+(const long long&) const;
     bigInteger &operator+=(const bigInteger&);
     bigInteger &operator+=(const long long&);
+    friend bigInteger operator+(const long long&, const bigInteger&);
 
     bigInteger operator-(const bigInteger&) const;
     bigInteger operator-(const long long&) const;
     bigInteger &operator-=(const bigInteger&);
     bigInteger &operator-=(const long long&);
+    friend bigInteger operator-(const long long&, const bigInteger&);
 
     bigInteger operator*(const bigInteger&) const;
     bigInteger operator*(const long long&) const;
     bigInteger &operator*=(const bigInteger&);
     bigInteger &operator*=(const long long&);
+    friend bigInteger operator*(const long long&, const bigInteger&);
 
     // Functions
     int castToInt();
