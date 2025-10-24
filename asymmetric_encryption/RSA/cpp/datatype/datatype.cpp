@@ -35,17 +35,18 @@ bigInteger::bigInteger(const std::string &number) {
 //----------------------Assignment Operators--------------------------
 bigInteger &bigInteger::operator=(const bigInteger &number) {
     this->value = number.value;
+    this->sign = number.sign;
 
     return *this;
 }
 
 bigInteger &bigInteger::operator=(const long long &number) {
-    this->value = std::to_string(number);
+    *this = bigInteger(number);
     return *this;
 }
 
 bigInteger &bigInteger::operator=(const std::string &number) {
-    this->value = number;
+    *this = number;
     return *this;
 }
 
@@ -161,22 +162,28 @@ bigInteger bigInteger::operator*(const bigInteger &number) const {
     for(int i = result.size() - 1; i >= 0; i--) {
         produkt.value.push_back('0' + result[i]);
     }
+
+    // handle negativ sign
+    if(this->sign == '-' && number.sign == '-') {
+        produkt.sign = '+';
+    } else if(this->sign == '-' || number.sign == '-') {
+        produkt.sign = '-';
+    }
+
     return produkt;
 }
 
 bigInteger bigInteger::operator*(const long long &number) const {
-    bigInteger first = number;
-    bigInteger second = this->value;
-    return first * second;
+    return *this * bigInteger(number);
 }
 
 bigInteger &bigInteger::operator*=(const bigInteger &number) {
-    this->value = (*this * number).value;
+   *this = *this * number;
     return *this;
 }
 
 bigInteger &bigInteger::operator*=(const long long &number) {
-    this->value = (*this * bigInteger(number)).value;
+    *this = *this * bigInteger(number);
     return *this;
 }
 
