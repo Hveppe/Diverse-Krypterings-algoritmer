@@ -8,6 +8,7 @@
 
 struct bigInteger {
     std::string value;
+    char sign;
 
     // constructor
     bigInteger();

@@ -6,44 +6,72 @@ bigInteger::bigInteger() {
 }
 
 bigInteger::bigInteger(const bigInteger &number) {
+    this->sign = number.sign;
     this->value = number.value;
 }
 
 bigInteger::bigInteger(const long long &number) {
-    this->value = std::to_string(number);
+    if(number < 0) {
+        this->sign = '-';
+        this->value = std::to_string(number).substr(1);
+    } else {
+        this->sign = '+';
+        this->value = std::to_string(number);
+    }
 }
 
 bigInteger::bigInteger(const std::string &number) {
-    this->value = number;
+    if(number[0] == '-') {
+        this->sign = '-';
+        this->value = number.substr(1);
+    } else {
+        this->sign = '+';
+        this->value = number;
+    }
+
+    
 }
 
 //----------------------Assignment Operators--------------------------
 bigInteger &bigInteger::operator=(const bigInteger &number) {
-    value = number.value;
+    this->value = number.value;
+
     return *this;
 }
 
 bigInteger &bigInteger::operator=(const long long &number) {
-    value = std::to_string(number);
+    this->value = std::to_string(number);
     return *this;
 }
 
 bigInteger &bigInteger::operator=(const std::string &number) {
-    value = number;
+    this->value = number;
     return *this;
 }
 
 //---------------------------Comparesion Operators---------------------------
 bool bigInteger::operator==(const bigInteger &number) const {
-    return this->value == number.value;
+    return (this->value == number.value && this->sign == number.sign);
 }
 
 bool bigInteger::operator==(const long long &number) const {
-    return this->value == std::to_string(number);
+    return *this == bigInteger(number);
 }
 
 //-------------------------------Operators----------------------------------
 bigInteger bigInteger::operator+(const bigInteger &number) const {
+    bool doubleNegativ = false;
+    
+    // handle negativ addition
+    if(this->sign == '-' && number.sign == '-') {
+        doubleNegativ = true;
+        //return -10;
+    } else if (this->sign == '-') {
+        return number - *this;
+    } else if (number.sign == '-') {
+        return *this - number;
+    }
+
     std::string first = this->value;
     std::string second = number.value; 
     
@@ -73,7 +101,11 @@ bigInteger bigInteger::operator+(const bigInteger &number) const {
     }
 
     // assign value
-    bigInteger returnResult =  result;
+    bigInteger returnResult = result;
+    if(doubleNegativ) {
+        returnResult.sign = '-';
+    }
+    std::cout << doubleNegativ << " " << returnResult.sign << "\n";
     return returnResult;
 }
 
@@ -159,6 +191,9 @@ int bigInteger::castToInt() {
 
 //------------------------std::cout instruction------------------------------
 std::ostream &operator<<(std::ostream &os, const bigInteger &number) {
+    if(number.sign == '-') {
+        os << number.sign;
+    }
     os << number.value;
     return os;
 }
