@@ -66,7 +66,6 @@ bigInteger bigInteger::operator+(const bigInteger &number) const {
     // handle negativ addition
     if(this->sign == '-' && number.sign == '-') {
         doubleNegativ = true;
-        //return -10;
     } else if (this->sign == '-') {
         return number - *this;
     } else if (number.sign == '-') {
@@ -85,7 +84,7 @@ bigInteger bigInteger::operator+(const bigInteger &number) const {
     int carry = 0;
     int sum;
 
-    std::string result(this->value.size() + 1, '0');
+    std::string result(first.size() + 1, '0');
 
     // Addition digit by digit 
     for(int i = first.size() - 1; i >= 0; i--) {
@@ -106,7 +105,6 @@ bigInteger bigInteger::operator+(const bigInteger &number) const {
     if(doubleNegativ) {
         returnResult.sign = '-';
     }
-    std::cout << doubleNegativ << " " << returnResult.sign << "\n";
     return returnResult;
 }
 
@@ -116,22 +114,95 @@ bigInteger bigInteger::operator+(const long long &number) const {
     return first + second;
 }
 
-bigInteger operator+(const long long &first, const bigInteger &second) {
-    return bigInteger(first) + second;
-}
-
 bigInteger &bigInteger::operator+=(const bigInteger &number) {
-    this->value = (*this + number).value;
+    *this = *this + number;
     return *this;
 }
 
 bigInteger &bigInteger::operator+=(const long long &number) {
-    this->value = (*this + bigInteger(number)).value;
+    *this = *this + number;
     return *this;
 }
 
+bigInteger operator+(const long long &first, const bigInteger &second) {
+    return bigInteger(first) + second;
+}
+
+bigInteger bigInteger::operator-() const {
+    bigInteger result = *this;
+    result.sign = '-';
+    return result;
+}
+
 bigInteger bigInteger::operator-(const bigInteger &number) const{
-    return bigInteger("0");
+    if(this->sign == '+' && number.sign == '-') {
+        bigInteger tempNumber = number;
+        tempNumber.sign = '+';
+        return *this + tempNumber;
+    } else if(this->sign == '-' && number.sign == '+') {
+        bigInteger tempNumber = *this;
+        tempNumber.sign = '+';
+        return -(tempNumber + number);
+    }
+
+    bool negativResult = false;
+    std::string first = this->value;
+    std::string second = number.value;
+
+    // check if result becomes negativ
+    if(first.size() < second.size() || (first.size() == second.size() && first < second)) {
+        std::swap(first, second);
+        negativResult = true;
+    }
+    
+    if(first.size() < second.size()) {
+        first = std::string(second.size() - first.size(), '0') + first;
+    } else if(second.size() < first.size()) {
+        second = std::string(first.size() - second.size(), '0') + second;
+    }
+
+    std::string result(first.size(), '0');
+    int borrow = 0;
+
+    for(int i = first.size() - 1; i >= 0; --i) {
+        int diff = (first[i] - '0') - (second[i] - '0') - borrow;
+        if (diff < 0) {
+            diff += 10;
+            borrow = 1;
+        } else {
+            borrow = 0;
+        }
+        result[i] = diff + '0';
+    }
+
+    result.erase(0, result.find_first_not_of('0'));
+    if(result.empty()) {
+        result = "0";
+    }
+
+    if(negativResult) {
+        return -bigInteger(result);
+    } else {
+        return bigInteger(result);
+    }
+}
+
+bigInteger bigInteger::operator-(const long long &number) const {
+    return *this - bigInteger(number);
+}
+
+bigInteger &bigInteger::operator-=(const bigInteger &number) {
+    *this = *this - number;
+    return *this;
+}
+
+bigInteger &bigInteger::operator-=(const long long &number) {
+    *this = *this - number;
+    return *this;
+}
+
+bigInteger operator-(const long long &first, const bigInteger &second) {
+    return bigInteger(first) - second;
 }
 
 bigInteger bigInteger::operator*(const bigInteger &number) const {
