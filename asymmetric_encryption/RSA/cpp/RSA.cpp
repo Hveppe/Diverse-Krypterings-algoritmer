@@ -20,24 +20,24 @@ long long modPow(long long base, unsigned long long exponent, long long modulus)
 }
 
 std::string encryptRSA(long long e, long long n, std::string message) {
-    std::string encryptedMessage = "";
-    int maxLen = std::to_string(n).length();
+    long long m = 0;
 
     for(char letter : message) {
-        std::string tempString = std::to_string(modPow(static_cast<int>(letter), e, n));
-        encryptedMessage.append(tempString.insert(0, maxLen - tempString.size(), '0'));
+        m = m * 256 + static_cast<unsigned char>(letter);
     }
 
-    return encryptedMessage;
+    long long c = modPow(m, e, n);
+    return std::to_string(c);
 }
 
 std::string decryptRSA(long long d, long long n, std::string message) {
+    long long c = std::stoll(message);
+    long long m = modPow(c, d, n);
     std::string decryptedMessage = "";
-    int maxLen = std::to_string(n).length();
-
-    for(int i = 0; i < message.size(); i += maxLen) {
-        std::string tempString = message.substr(i, maxLen);
-        decryptedMessage.push_back(static_cast<char>(modPow(std::stoll(tempString), d, n)));
+    
+    while(m > 0) {
+        decryptedMessage.insert(decryptedMessage.begin(), static_cast<char>(m % 256));
+        m /= 256;
     }
 
     return decryptedMessage;

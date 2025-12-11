@@ -3,6 +3,7 @@
 
 #include <string>
 #include <iostream>
+#include <vector>
 
 // define functions and structs for export to other files
 struct keyRSA {
